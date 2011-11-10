@@ -1,0 +1,118 @@
+name: SuperPermsTest
+
+author: Evenprime
+
+main: cc.co.evenprime.bukkit.superpermstest.SuperPermsTest
+version: 0.1
+
+commands:
+  performancetest:
+    description: PerformanceTest command
+    usage: |
+           /<command> playername [samplesize] - run the test
+
+permissions:
+  layer11:
+    description: Test 1 parent
+    default: false
+    children:
+      layer21:
+        description: Test 1 child
+        children:
+          layer31:
+            description: Test 1 grandchild
+            children:
+              layer41:
+                description: Test 1 grandgrandchild
+  layer12:
+    description: Test 2 parent
+    default: false
+    children:
+      layer22:
+        description: Test 2 child
+        children:
+          layer32:
+            description: Test 2 grandchild
+            children:
+              layer42:
+                description: Test 2 grandgrandchild
+  layer13:
+    description: Test 3 parent
+    default: false
+    children:
+      layer23:
+        description: Test 3 child
+        children:
+          layer33:
+            description: Test 3 grandchild
+            children:
+              layer43:
+                description: Test 3 grandgrandchild
+  layer14:
+    description: Test 4 parent
+    default: false
+    children:
+      layer24:
+        description: Test 4 child
+        children:
+          layer34:
+            description: Test 4 grandchild
+            children:
+              layer44:
+                description: Test 4 grandgrandchild
+  layer15:
+    description: Test 5 parent
+    default: false
+    children:
+      layer25:
+        description: Test 5 child
+        children:
+          layer35:
+            description: Test 5 grandchild
+            children:
+              layer45:
+                description: Test 5 grandgrandchild
+  layer16:
+    description: Test 6 parent
+    default: false
+    children:
+      layer26:
+        description: Test 6 child
+        children:
+          layer36:
+            description: Test 6 grandchild
+            children:
+              layer46:
+                description: Test 6 grandgrandchild
+  layer17:
+    description: Test 7 parent
+    default: false
+    children:
+      layer27:
+        description: Test 7 child
+        children:
+          layer37:
+            description: Test 7 grandchild
+            children:
+              layer47:
+                description: Test 7 grandgrandchild
+  layer18:
+    description: Test 8 parent
+    default: false
+    children:
+      layer28:
+        description: Test 8 child
+        children:
+          layer38:
+            description: Test 8 grandchild
+            children:
+              layer48:
+                description: Test 8 grandgrandchild
+
+  single1:
+    description: Test 9 standalone permission 1
+    default: true
+
+  single2:
+    description: Test 9 standalone permission 2
+    default: false
