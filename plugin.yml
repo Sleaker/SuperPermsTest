@@ -6,7 +6,7 @@ main: cc.co.evenprime.bukkit.superpermstest.SuperPermsTest
 version: 0.1
 
 commands:
-  performancetest:
+  superpermstest:
     description: PerformanceTest command
     usage: |
            /<command> playername [samplesize] - run the test
