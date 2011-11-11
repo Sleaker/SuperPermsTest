@@ -140,17 +140,17 @@ permissions:
         description: Test 11 child
 
   str2.c2:
-    description: Test 12 fake child
+    description: Test 11 fake child
     default: false
     
   
   str3.*:
-    description: Test 13 standalone - The player has this permission assigned
+    description: Test 12 standalone - The player has this permission assigned
     default: false
     
   str3:
-    description: Test 13 parent
+    description: Test 12 parent
     default: false
     children:
       c1.str3:
-        description: Test 13 child
+        description: Test 12 child
