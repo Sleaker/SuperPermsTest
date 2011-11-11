@@ -37,45 +37,51 @@ public class SuperPermsTest extends JavaPlugin {
 
 	public void onEnable() {
 
-		this.testcases.add(new Testcase("test1", new String[] { "layer11",
+		this.testcases.add(new Testcase("test01", new String[] { "layer11",
 				"layer21", "layer31", "layer41" }, new boolean[] { false,
 				false, false, false }));
 
-		this.testcases.add(new Testcase("test2", new String[] { "layer12",
+		this.testcases.add(new Testcase("test02", new String[] { "layer12",
 				"layer22", "layer32", "layer42" }, new boolean[] { true, true,
 				true, true }));
 
-		this.testcases.add(new Testcase("test3", new String[] { "layer13",
+		this.testcases.add(new Testcase("test03", new String[] { "layer13",
 				"layer23", "layer33", "layer43" }, new boolean[] { true, true,
 				true, true }));
 
-		this.testcases.add(new Testcase("test4", new String[] { "layer14",
+		this.testcases.add(new Testcase("test04", new String[] { "layer14",
 				"layer24", "layer34", "layer44" }, new boolean[] { false, true,
 				true, true }));
 
-		this.testcases.add(new Testcase("test5", new String[] { "layer15",
+		this.testcases.add(new Testcase("test05", new String[] { "layer15",
 				"layer25", "layer35", "layer45" }, new boolean[] { false,
 				false, true, true }));
 
-		this.testcases.add(new Testcase("test6", new String[] { "layer16",
+		this.testcases.add(new Testcase("test06", new String[] { "layer16",
 				"layer26", "layer36", "layer46" }, new boolean[] { false,
 				false, false, true }));
 
-		this.testcases.add(new Testcase("test7", new String[] { "layer17",
+		this.testcases.add(new Testcase("test07", new String[] { "layer17",
 				"layer27", "layer37", "layer47" }, new boolean[] { true, false,
 				false, false }));
 
-		this.testcases.add(new Testcase("test8", new String[] { "layer18",
+		this.testcases.add(new Testcase("test08", new String[] { "layer18",
 				"layer28", "layer38", "layer48" }, new boolean[] { true, false,
 				true, true }));
 
-		this.testcases.add(new Testcase("test9", new String[] { "single1",
+		this.testcases.add(new Testcase("test09", new String[] { "single1",
 				"single2" }, new boolean[] { true, false }));
 
-		this.testcases.add(new Testcase("test10", new String[] { "undefi1",
-				"undefi2" }, new boolean[] { true, false }));
+		this.testcases.add(new Testcase("test10", new String[] { "str1",
+				"str1.c1", "str1.c2" }, new boolean[] { true, true, false }));
 
-		System.out.println("Performance Test enabled");
+		this.testcases.add(new Testcase("test11", new String[] { "str2.*",
+				"str2", "str2.c1", "str2.c2" }, new boolean[] { true, false, true, false }));
+
+		this.testcases.add(new Testcase("test12", new String[] { "str3.*",
+				"str3", "c1.str3" }, new boolean[] { true, false, false }));
+
+		System.out.println("[SuperPermsTest] version [" + this.getDescription().getVersion() + "] is enabled.");
 	}
 
 	@Override
@@ -111,22 +117,7 @@ public class SuperPermsTest extends JavaPlugin {
 					+ defaultSampleSize);
 		}
 
-		/** CORRECTNESS TEST **/
-
-		// Each permission asked one time, checked against expected results
-		boolean failed = false;
-		for (Testcase testcase : testcases) {
-			failed = correctnessTest(sender, player, testcase) || failed;
-		}
-
-		// At least one of the correctness tests failed, so makes no
-		// sense to advance
-		if (failed)
-			return true;
-
-		/** CORRECTNESS TEST END **/
-
-		// Now "warm up" the permissions plugin, that means fill caches,
+		// "warm up" the permissions plugin, that means fill caches,
 		// if existing, by asking for each permission 100 times (should
 		// be reasonable fast on any server)
 		for (int i = 0; i < 100; i++) {
@@ -139,19 +130,36 @@ public class SuperPermsTest extends JavaPlugin {
 				}
 			}
 		}
+		
+		/** CORRECTNESS TEST **/
 
-		/** PERFORMANCE TEST **/
-
-		// now do the actual performance tests in order
+		// Each permission asked one time, checked against expected results
+		boolean failed = false;
 		for (Testcase testcase : testcases) {
-			performanceTestSequential(sender, player, testcase, sampleSize);
+			
+			boolean failedTest = false;
+			failedTest = correctnessTest(sender, player, testcase);
+			
+			if(!failedTest) {
+				// Passed the test, so how about performance?
+				performanceTestSequential(sender, player, testcase, sampleSize);
+			}
+			else {
+				// Skipping performance test
+				failed = true;
+			}
 		}
 
-		// To finish it off, do the "random" test which will pick random
-		// permissions and test them
-		performanceTestRandom(sender, player, testcases, sampleSize);
+		// At least one of the correctness tests failed, so don't do the "random"
+		// test, as it would be run on false premises
+		if (failed) {
+			sender.sendMessage("Skipping random test because of failed correctness test(s).");
+			return true;
+		}
+		else {
+			performanceTestRandom(sender, player, testcases, sampleSize);
+		}
 
-		/** PERFORMANCE TEST END **/
 		return true;
 	}
 

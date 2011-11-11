@@ -3,7 +3,7 @@ name: SuperPermsTest
 author: Evenprime
 
 main: cc.co.evenprime.bukkit.superpermstest.SuperPermsTest
-version: 0.1
+version: 0.2
 
 commands:
   superpermstest:
@@ -25,19 +25,19 @@ permissions:
               layer41:
                 description: Test 1 grandgrandchild
   layer12:
-    description: Test 2 parent
+    description: Test 2 parent - The player has this permission assigned
     default: false
     children:
       layer22:
-        description: Test 2 child
+        description: Test 2 child - The player has this permission assigned
         children:
           layer32:
-            description: Test 2 grandchild
+            description: Test 2 grandchild - The player has this permission assigned
             children:
               layer42:
-                description: Test 2 grandgrandchild
+                description: Test 2 grandgrandchild - The player has this permission assigned
   layer13:
-    description: Test 3 parent
+    description: Test 3 parent - The player has this permission assigned
     default: false
     children:
       layer23:
@@ -53,7 +53,7 @@ permissions:
     default: false
     children:
       layer24:
-        description: Test 4 child
+        description: Test 4 child - The player has this permission assigned
         children:
           layer34:
             description: Test 4 grandchild
@@ -68,7 +68,7 @@ permissions:
         description: Test 5 child
         children:
           layer35:
-            description: Test 5 grandchild
+            description: Test 5 grandchild - The player has this permission assigned
             children:
               layer45:
                 description: Test 5 grandgrandchild
@@ -83,13 +83,13 @@ permissions:
             description: Test 6 grandchild
             children:
               layer46:
-                description: Test 6 grandgrandchild
+                description: Test 6 grandgrandchild - The player has this permission assigned
   layer17:
-    description: Test 7 parent
+    description: Test 7 parent - The player has this permission assigned
     default: false
     children:
       layer27:
-        description: Test 7 child
+        description: Test 7 child - The player has this permission assigned as false
         children:
           layer37:
             description: Test 7 grandchild
@@ -97,14 +97,14 @@ permissions:
               layer47:
                 description: Test 7 grandgrandchild
   layer18:
-    description: Test 8 parent
+    description: Test 8 parent - The player has this permission assigned
     default: false
     children:
       layer28:
-        description: Test 8 child
+        description: Test 8 child - The player has this permission assigned as false
         children:
           layer38:
-            description: Test 8 grandchild
+            description: Test 8 grandchild - The player has this permission assigned
             children:
               layer48:
                 description: Test 8 grandgrandchild
@@ -116,3 +116,41 @@ permissions:
   single2:
     description: Test 9 standalone permission 2
     default: false
+
+  str1:
+    description: Test 10 parent - The player has this permission assigned
+    default: false
+    children:
+      str1.c1:
+        description: Test 10 child
+
+  str1.c2:
+    description: Test 10 fake child
+    default: false
+
+  str2:
+    description: Test 11 standalone
+    default: false
+
+  str2.*:
+    description: Test 11 parent - The player has this permission assigned
+    default: false
+    children:
+      str2.c1:
+        description: Test 11 child
+
+  str2.c2:
+    description: Test 12 fake child
+    default: false
+    
+  
+  str3.*:
+    description: Test 13 standalone - The player has this permission assigned
+    default: false
+    
+  str3:
+    description: Test 13 parent
+    default: false
+    children:
+      c1.str3:
+        description: Test 13 child
