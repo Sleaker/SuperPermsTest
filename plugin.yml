@@ -154,3 +154,8 @@ permissions:
     children:
       c1.str3:
         description: Test 12 child
+        
+  Case1:
+    description: Test 13 case - The player has this permission assigned
+    default: true
+    

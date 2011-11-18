@@ -80,7 +80,13 @@ public class SuperPermsTest extends JavaPlugin {
 
 		this.testcases.add(new Testcase("test12", new String[] { "str3.*",
 				"str3", "c1.str3" }, new boolean[] { true, false, false }));
-
+		
+		this.testcases.add(new Testcase("test13", new String[] { "case1" }, 
+				new boolean[] { true }));
+		
+		this.testcases.add(new Testcase("test14", new String[] { "attach1" }, 
+				new boolean[] { true }));
+		
 		System.out.println("[SuperPermsTest] version [" + this.getDescription().getVersion() + "] is enabled.");
 	}
 
@@ -116,7 +122,9 @@ public class SuperPermsTest extends JavaPlugin {
 			sender.sendMessage("Using default sample size of "
 					+ defaultSampleSize);
 		}
-
+		
+		player.addAttachment(this, "attach1", true);
+		
 		// "warm up" the permissions plugin, that means fill caches,
 		// if existing, by asking for each permission 100 times (should
 		// be reasonable fast on any server)
