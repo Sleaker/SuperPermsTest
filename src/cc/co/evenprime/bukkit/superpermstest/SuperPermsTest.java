@@ -8,7 +8,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.nijikokun.bukkit.Permissions.Permissions;
+import com.nijiko.permissions.PermissionHandler;
 
 /**
  * 
@@ -34,9 +38,13 @@ public class SuperPermsTest extends JavaPlugin {
 	}
 
 	private List<Testcase> testcases = new ArrayList<Testcase>();
-
+	private PermissionHandler pHandler;
+	
 	public void onEnable() {
-
+		Plugin p = getServer().getPluginManager().getPlugin("Permissions");
+		if (p != null)
+			pHandler = ((Permissions) p).getHandler();
+		
 		this.testcases.add(new Testcase("test01", new String[] { "layer11",
 				"layer21", "layer31", "layer41" }, new boolean[] { false,
 				false, false, false }));
@@ -167,7 +175,38 @@ public class SuperPermsTest extends JavaPlugin {
 		else {
 			performanceTestRandom(sender, player, testcases, sampleSize);
 		}
-
+		
+		//Don't run bridge tests if the bridge isn't installed
+		if (pHandler == null)
+			return true;
+		
+		/** Permission Bridge Correctness **/
+		failed = false;
+		for (Testcase testcase : testcases) {
+			
+			boolean failedTest = false;
+			failedTest = bridgeCorrectnessTest(sender, player, testcase);
+			
+			if(!failedTest) {
+				// Passed the test, so how about performance?
+				performanceBridgeTestSequential(sender, player, testcase, sampleSize);
+			}
+			else {
+				// Skipping performance test
+				failed = true;
+			}
+		}
+		
+		// At least one of the correctness tests failed, so don't do the "random"
+		// test, as it would be run on false premises
+		if (failed) {
+			sender.sendMessage("Skipping random test because of failed correctness test(s).");
+			return true;
+		}
+		else {
+			performanceBridgeTestRandom(sender, player, testcases, sampleSize);
+		}
+		
 		return true;
 	}
 
@@ -191,7 +230,45 @@ public class SuperPermsTest extends JavaPlugin {
 
 		return failed;
 	}
+	
+	private boolean bridgeCorrectnessTest(CommandSender sender, Player player, 
+			Testcase testcase) {
+		
+		String[] perms = testcase.perms;
+		boolean[] results = testcase.results;
+		String world = player.getWorld().getName();
+		String pName = player.getName();
+		
+		boolean failed = false;
+		
+		for (int i = 0; i < perms.length; i++) {
+			if (pHandler.has(world, pName, perms[i]) != results[i]) {
+				// If it doesn't deliver correct answers, we stop right here
+				sender.sendMessage("Bridge Failed " + testcase.name + ": " + perms[i]
+						+ " should be " + results[i] + " but was "
+						+ !results[i]
+						+ "! Please review your permissions setup.");
+				failed = true;
+			}
+		}
+		return failed;
+	}
+	
+	private void performanceBridgeTestSequential(CommandSender sender, Player player,
+			Testcase testcase, int samplesize) {
 
+		String[] perms = testcase.perms;
+		boolean[] results = testcase.results;
+		String message = testcase.name + ": ";
+
+		for (int i = 0; i < perms.length; i++) {
+			long time = runBridgeTest(player, perms[i], samplesize);
+			message += perms[i] + "(" + (results[i] ? "T" : "F") + "): " + time
+					+ " ns ";
+		}
+		sender.sendMessage(message);
+	}
+	
 	private void performanceTestSequential(CommandSender sender, Player player,
 			Testcase testcase, int samplesize) {
 
@@ -206,7 +283,7 @@ public class SuperPermsTest extends JavaPlugin {
 		}
 		sender.sendMessage(message);
 	}
-
+	
 	private void performanceTestRandom(CommandSender sender, Player player,
 			List<Testcase> testcases, int samplesize) {
 
@@ -237,11 +314,55 @@ public class SuperPermsTest extends JavaPlugin {
 
 		sender.sendMessage("Random test: " + time + " ns");
 	}
+	
+	private void performanceBridgeTestRandom(CommandSender sender, Player player,
+			List<Testcase> testcases, int samplesize) {
 
+		// Set up an array of "samplesize" size and fill it with
+		// random permissions from the testcases
+		String[] entries = new String[samplesize];
+		List<String> perms = new ArrayList<String>();
+
+		for (Testcase testcase : testcases) {
+			for (String perm : testcase.perms) {
+				perms.add(perm);
+			}
+		}
+
+		Random generator = new Random();
+
+		for (int i = 0; i < entries.length; i++) {
+			entries[i] = perms.get(generator.nextInt(perms.size()));
+		}
+		
+		String pName = player.getName();
+		String world = player.getWorld().getName();
+		
+		// Now run the test
+		long startTime = System.nanoTime();
+		for (int i = 0; i < entries.length; i++) {
+			pHandler.has(world, pName, entries[i]);
+		}
+
+		long time = (System.nanoTime() - startTime) / samplesize;
+
+		sender.sendMessage("Random test: " + time + " ns");
+	}
+	
 	private long runtest(Player player, String permission, int samplesize) {
 		long startTime = System.nanoTime();
 		for (int i = 0; i < samplesize; i++) {
 			player.hasPermission(permission);
+		}
+		return (System.nanoTime() - startTime) / samplesize;
+	}
+	
+	private long runBridgeTest(Player player, String permission, int samplesize) {
+		String world = player.getWorld().getName();
+		String pName = player.getName();
+		long startTime = System.nanoTime();
+		for(int i = 0; i < samplesize; i++) {
+			pHandler.has(world, pName, permission);
 		}
 		return (System.nanoTime() - startTime) / samplesize;
 	}

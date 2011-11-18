@@ -4,7 +4,7 @@ author: Evenprime
 
 main: cc.co.evenprime.bukkit.superpermstest.SuperPermsTest
 version: 0.2
-
+softdepend: [ Permissions ]
 commands:
   superpermstest:
     description: PerformanceTest command
